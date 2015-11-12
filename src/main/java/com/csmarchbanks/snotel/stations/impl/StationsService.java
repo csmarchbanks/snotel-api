@@ -55,6 +55,12 @@ public class StationsService {
                 maxLatitude, minLongitude, maxLongitude, minElevation, maxElevation, heightDepths, true);
     }
 
+    private static List<String> getStationTripletsByLocation(BigDecimal minLatitude, BigDecimal maxLatitude,
+                                                             BigDecimal minLongitude, BigDecimal maxLongitude){
+        return getStationTriplets(null, null, null, null, minLatitude, maxLatitude, minLongitude, maxLongitude,
+                null, null, null, true);
+    }
+
     public static List<StationMetaData> getStationsMetadata(String state){
 
         List<String> stateCds = null;
@@ -63,5 +69,38 @@ public class StationsService {
         }
 
         return getSnotelService().getStationMetadataMultiple(getStationTripletsByStates(stateCds));
+    }
+
+    public static List<StationMetaData> getStationsMetadata(
+            List<String> stationIds,
+            List<String> stateCds,
+            List<String> hucs,
+            List<String> countyNames,
+            BigDecimal minLatitude,
+            BigDecimal maxLatitude,
+            BigDecimal minLongitude,
+            BigDecimal maxLongitude,
+            BigDecimal minElevation,
+            BigDecimal maxElevation,
+            boolean logicalAnd
+    ){
+        return getSnotelService().getStationMetadataMultiple(getStationTriplets(stationIds,
+                stateCds, hucs, countyNames, minLatitude,
+                maxLatitude, minLongitude, maxLongitude, minElevation,
+                maxElevation, null, logicalAnd));
+    }
+
+    public static List<StationMetaData> getStationsNear(BigDecimal latitude, BigDecimal longitude, BigDecimal deltaLat, BigDecimal deltaLong){
+        // default to within half a degree
+        deltaLat = null == deltaLat ? new BigDecimal(0.5) : deltaLat;
+        deltaLong = null == deltaLong ? new BigDecimal(0.5) : deltaLong;
+
+        BigDecimal minLatitude = latitude.subtract(deltaLat);
+        BigDecimal maxLatitude = latitude.add(deltaLat);
+        BigDecimal minLongitude = longitude.subtract(deltaLong);
+        BigDecimal maxLongitude = longitude.add(deltaLong);
+
+        return getSnotelService().getStationMetadataMultiple(getStationTripletsByLocation(minLatitude, maxLatitude,
+                minLongitude, maxLongitude));
     }
 }

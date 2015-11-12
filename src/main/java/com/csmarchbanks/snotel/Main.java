@@ -6,11 +6,8 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.xml.namespace.QName;
-import javax.xml.ws.WebServiceFeature;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 
 /**
  * Main class.
