@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static com.csmarchbanks.snotel.Main.getSnotelService;
+import static com.csmarchbanks.snotel.triplets.impl.TripletsService.getStationTriplets;
+import static com.csmarchbanks.snotel.triplets.impl.TripletsService.getStationTripletsByLocation;
+import static com.csmarchbanks.snotel.triplets.impl.TripletsService.getStationTripletsByStates;
 
 /**
  * Implementation of getting metadata about stations
@@ -14,51 +17,6 @@ import static com.csmarchbanks.snotel.Main.getSnotelService;
  */
 public class StationsService {
     private static Map<String, StationMetaData> stationMetaDatas = new HashMap<>();
-
-    private static List<String> getStationTriplets(
-            List<String> stationIds,
-            List<String> stateCds,
-            List<String> hucs,
-            List<String> countyNames,
-            BigDecimal minLatitude,
-            BigDecimal maxLatitude,
-            BigDecimal minLongitude,
-            BigDecimal maxLongitude,
-            BigDecimal minElevation,
-            BigDecimal maxElevation,
-            List<HeightDepth> heightDepths,
-            boolean logicalAnd
-    ){
-        List<String> networkCds = Arrays.asList("SNTL");
-        List<Integer> ordinals = Arrays.asList(1);
-        List<String> elementCodes = Arrays.asList("WTEQ");
-
-        return getSnotelService().getStations(stationIds,
-                stateCds, networkCds, hucs, countyNames, minLatitude,
-                maxLatitude, minLongitude, maxLongitude, minElevation,
-                maxElevation, elementCodes, ordinals, heightDepths, logicalAnd);
-    }
-
-    private static List<String> getStationTripletsByStates(List<String> stateCds){
-        List<String> stationIds = null;
-        List<String> hucs = null;
-        List<String> countyNames = null;
-        BigDecimal minLatitude = null;
-        BigDecimal maxLatitude = null;
-        BigDecimal minLongitude = null;
-        BigDecimal maxLongitude = null;
-        BigDecimal minElevation = null;
-        BigDecimal maxElevation = null;
-        List<HeightDepth> heightDepths = null;
-        return getStationTriplets(stationIds, stateCds, hucs, countyNames, minLatitude,
-                maxLatitude, minLongitude, maxLongitude, minElevation, maxElevation, heightDepths, true);
-    }
-
-    private static List<String> getStationTripletsByLocation(BigDecimal minLatitude, BigDecimal maxLatitude,
-                                                             BigDecimal minLongitude, BigDecimal maxLongitude){
-        return getStationTriplets(null, null, null, null, minLatitude, maxLatitude, minLongitude, maxLongitude,
-                null, null, null, true);
-    }
 
     public static List<StationMetaData> getStationsMetadata(String state){
 

@@ -1,10 +1,13 @@
 package com.csmarchbanks.snotel.data.rest;
 
 import com.csmarchbanks.snotel.data.impl.DataService;
+import com.csmarchbanks.snotel.stations.impl.StationsService;
 import gov.usda.nrcs.wcc.awdbWebService.Data;
+import gov.usda.nrcs.wcc.awdbWebService.StationMetaData;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -13,6 +16,7 @@ import java.util.List;
  */
 @Path("data")
 public class DataRestController {
+
 
     @GET
     @Path("station/{stationTriplet}")
@@ -23,9 +27,20 @@ public class DataRestController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Data> getDataForStations(
-            @QueryParam("triplet") List<String> stationTriplets
-    ) {
-        return DataService.getData(stationTriplets);
+    public List<Data> getDataForQuery(
+            @QueryParam("triplet") List<String> stationIds,
+            @QueryParam("state") List<String> stateCds,
+            @QueryParam("huc") List<String> hucs,
+            @QueryParam("county") List<String> countyNames,
+            @QueryParam("minLat") BigDecimal minLatitude,
+            @QueryParam("maxLat") BigDecimal maxLatitude,
+            @QueryParam("minLong") BigDecimal minLongitude,
+            @QueryParam("maxLong") BigDecimal maxLongitude,
+            @QueryParam("minEl") BigDecimal minElevation,
+            @QueryParam("maxEl") BigDecimal maxElevation,
+            @DefaultValue("true") @QueryParam("logicalAnd") Boolean logicalAnd
+    ){
+        return DataService.getData(stationIds, stateCds, hucs, countyNames,
+                minLatitude, maxLatitude, minLongitude, maxLongitude, minElevation, maxElevation, logicalAnd);
     }
 }

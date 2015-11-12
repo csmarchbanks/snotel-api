@@ -4,6 +4,7 @@ import gov.usda.nrcs.wcc.awdbWebService.Data;
 import gov.usda.nrcs.wcc.awdbWebService.Duration;
 import gov.usda.nrcs.wcc.awdbWebService.HeightDepth;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.csmarchbanks.snotel.Main.getSnotelService;
+import static com.csmarchbanks.snotel.triplets.impl.TripletsService.getStationTriplets;
 
 /**
  * Implementation of getting data from stations
@@ -49,5 +51,26 @@ public class DataService {
         } else {
             return new Data();
         }
+    }
+
+    public static List<Data> getData(
+            List<String> stationIds,
+            List<String> stateCds,
+            List<String> hucs,
+            List<String> countyNames,
+            BigDecimal minLatitude,
+            BigDecimal maxLatitude,
+            BigDecimal minLongitude,
+            BigDecimal maxLongitude,
+            BigDecimal minElevation,
+            BigDecimal maxElevation,
+            boolean logicalAnd
+    ){
+
+        List<String> stationTriplets = getStationTriplets(stationIds,
+                stateCds, hucs, countyNames, minLatitude,
+                maxLatitude, minLongitude, maxLongitude, minElevation,
+                maxElevation, null, logicalAnd);
+        return getData(stationTriplets);
     }
 }
