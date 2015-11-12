@@ -4,8 +4,7 @@ import gov.usda.nrcs.wcc.awdbWebService.HeightDepth;
 import gov.usda.nrcs.wcc.awdbWebService.StationMetaData;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.csmarchbanks.snotel.Main.getSnotelService;
 
@@ -14,9 +13,9 @@ import static com.csmarchbanks.snotel.Main.getSnotelService;
  * Created by cmarchbanks on 11/8/15.
  */
 public class StationsService {
-    private static List<StationMetaData> stationMetaDatas;
+    private static Map<String, StationMetaData> stationMetaDatas = new HashMap<>();
 
-    public static List<String> getStationTriplets(
+    private static List<String> getStationTriplets(
             List<String> stationIds,
             List<String> stateCds,
             List<String> hucs,
@@ -40,7 +39,7 @@ public class StationsService {
                 maxElevation, elementCodes, ordinals, heightDepths, logicalAnd);
     }
 
-    public static List<String> getStationTripletsByStates(List<String> stateCds){
+    private static List<String> getStationTripletsByStates(List<String> stateCds){
         List<String> stationIds = null;
         List<String> hucs = null;
         List<String> countyNames = null;
@@ -68,7 +67,34 @@ public class StationsService {
             stateCds = Arrays.asList(state);
         }
 
-        return getSnotelService().getStationMetadataMultiple(getStationTripletsByStates(stateCds));
+        return getStationMetadataFromTriplets(getStationTripletsByStates(stateCds));
+    }
+
+    public static List<StationMetaData> getAllStationsMetadata(){
+        return getStationsMetadata(null);
+    }
+
+    public static List<StationMetaData> getStationMetadataFromTriplets(List<String> stationTriplets){
+        List<StationMetaData> stations = new ArrayList<>();
+        List<String> newTriplets = new ArrayList<>();
+
+        stationTriplets.forEach(station ->{
+            StationMetaData metadata = stationMetaDatas.get(station);
+            if(null != metadata){
+                stations.add(metadata);
+            } else {
+                newTriplets.add(station);
+            }
+        });
+
+
+        if(!newTriplets.isEmpty()) {
+            List<StationMetaData> newStations = getSnotelService().getStationMetadataMultiple(newTriplets);
+            stations.addAll(newStations);
+            newStations.forEach(station -> stationMetaDatas.put(station.getStationTriplet(), station));
+        }
+
+        return stations;
     }
 
     public static List<StationMetaData> getStationsMetadata(
@@ -84,10 +110,12 @@ public class StationsService {
             BigDecimal maxElevation,
             boolean logicalAnd
     ){
-        return getSnotelService().getStationMetadataMultiple(getStationTriplets(stationIds,
+        List<String> stationTriplets = getStationTriplets(stationIds,
                 stateCds, hucs, countyNames, minLatitude,
                 maxLatitude, minLongitude, maxLongitude, minElevation,
-                maxElevation, null, logicalAnd));
+                maxElevation, null, logicalAnd);
+
+        return getStationMetadataFromTriplets(stationTriplets);
     }
 
     public static List<StationMetaData> getStationsNear(BigDecimal latitude, BigDecimal longitude, BigDecimal deltaLat, BigDecimal deltaLong){
@@ -100,7 +128,7 @@ public class StationsService {
         BigDecimal minLongitude = longitude.subtract(deltaLong);
         BigDecimal maxLongitude = longitude.add(deltaLong);
 
-        return getSnotelService().getStationMetadataMultiple(getStationTripletsByLocation(minLatitude, maxLatitude,
+        return getStationMetadataFromTriplets(getStationTripletsByLocation(minLatitude, maxLatitude,
                 minLongitude, maxLongitude));
     }
 }

@@ -1,5 +1,6 @@
 package com.csmarchbanks.snotel;
 
+import com.csmarchbanks.snotel.stations.impl.StationsService;
 import gov.usda.nrcs.wcc.awdbWebService.AwdbWebService;
 import gov.usda.nrcs.wcc.awdbWebService.AwdbWebService_Service;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -39,9 +40,19 @@ public class Main {
      * @return Grizzly HTTP server.
      */
     public static HttpServer startServer() {
-        // create a resource config that scans for JAX-RS resources and providers
-        // in com.example package
+        System.out.println("Initializing AWDB Web Service...");
+        long startTime = System.currentTimeMillis();
         initWebService();
+        long endTime = System.currentTimeMillis();
+        System.out.println("AWDB Web Service initialized in: " + (endTime - startTime) + " ms");
+
+        // pull in all metadata resources on server startup
+        System.out.println("Initializing station metadata...");
+        startTime = System.currentTimeMillis();
+        StationsService.getAllStationsMetadata();
+        endTime = System.currentTimeMillis();
+        System.out.println("Station metadata initialized in: " + (endTime - startTime) + " ms");
+
         final ResourceConfig rc = new ResourceConfig().packages("com.csmarchbanks.snotel");
 
         // create and start a new instance of grizzly http server
