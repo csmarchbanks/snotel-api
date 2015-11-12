@@ -1,7 +1,6 @@
 package com.csmarchbanks.snotel.stations.rest;
 
-import com.csmarchbanks.snotel.stations.impl.Stations;
-import gov.usda.nrcs.wcc.awdbWebService.Data;
+import com.csmarchbanks.snotel.stations.impl.StationsService;
 import gov.usda.nrcs.wcc.awdbWebService.StationMetaData;
 
 import javax.ws.rs.GET;
@@ -12,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
+ * Controller for getting metadata about stations
  * Created by cmarchbanks on 11/6/15.
  */
 @Path("stations")
@@ -19,14 +19,14 @@ public class StationsRestController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Data> getStations(){
-        return Stations.getStations(null);
+    public List<StationMetaData> getStations(){
+        return StationsService.getStationsMetadata(null);
     }
 
     @GET
     @Path("{state}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Data> getStationsByState(@PathParam("state") String state){
-        return Stations.getStations(state);
+    public List<StationMetaData> getStationsByState(@PathParam("state") String state){
+        return StationsService.getStationsMetadata(state);
     }
 }
